@@ -1,0 +1,35 @@
+services:
+  # 1. The PX4 & Gazebo Simulation
+  px4-sim:
+    build: .
+    container_name: atmos_sim
+    network_mode: host
+    ipc: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      # Mounts the X11 socket for Gazebo GUI
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./workspace/:/workspace
+    # Launches the simulation and QGC without FUSE
+    command: >
+      /bin/bash -c "
+      useradd -m qgcuser || true &&
+      sudo -E -u qgcuser /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run &
+      source /opt/ros/jazzy/setup.bash &&
+      source /px4_ws/install/setup.bash &&
+      cd /PX4-Autopilot &&
+      make px4_sitl_spacecraft gz_atmos
+      "
+
+  # 2. The Micro-XRCE-DDS Bridge
+  dds-agent:
+    build: .
+    container_name: atmos_dds_agent
+    network_mode: host
+    command: >
+      /bin/bash -c "
+      MicroXRCEAgent udp4 -p 8888
+      "
