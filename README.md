@@ -55,7 +55,7 @@ xhost +local:
 **2. Launch the Simulation**
 Spin up both the PX4/Gazebo simulator and the Micro-XRCE-DDS Agent.
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 **If you want to build the image locally**
@@ -85,5 +85,5 @@ ros2 topic echo /fmu/out/vehicle_attitude
 
 To cleanly stop the simulation, stop the DDS bridge, and tear down the containers:
 ```bash
-docker-compose down
+docker compose down
 ```
