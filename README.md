@@ -27,6 +27,17 @@ To run this simulation, your host machine must have:
 
 > **Note for Windows/WSL 2 Users:** Compiling modern C++ (Fast-DDS/PX4) requires significant memory. It is highly recommended to increase your WSL memory limit in your `.wslconfig` file (e.g., `memory=16GB`) before building, otherwise the `docker build` step may hang.
 
+**For Windows users**
+1. Install WSL2 and Ubuntu
+They need to open PowerShell as Administrator and run:
+```bash
+wsl --install
+```
+(If they are on Windows 11, this automatically installs WSLg, which handles all the GUI rendering out-of-the-box).
+
+2. Enable WSL Integration in Docker Desktop
+They must open Docker Desktop, go to Settings > Resources > WSL Integration, and ensure the toggle for their Ubuntu distribution is turned ON.
+
 ---
 
 ## 🚀 Quick Start
@@ -38,15 +49,21 @@ git clone [https://github.com/YourUsername/docker-gz-sim.git](https://github.com
 ```bash
 cd docker-gz-sim
 ```
-**2. Build the Docker Image**
-This will take some time upon the first run as it compiles PX4 and the DDS agent from source.
-```bash
-docker build .
-```
-**3. Launch the Simulation**
+**2. Launch the Simulation**
 Spin up both the PX4/Gazebo simulator and the Micro-XRCE-DDS Agent.
 ```bash
 docker-compose up -d
+```
+
+**If you want to build the image locally**
+This is not necessary if you want to test run the simulation.
+```bash
+cd docker-gz-sim
+```
+**Build the Docker Image**
+This will take some time upon the first run as it compiles PX4 and the DDS agent from source.
+```bash
+docker build .
 ```
 
 📡 Accessing ROS 2 Topics
