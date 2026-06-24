@@ -1,8 +1,8 @@
 services:
   # 1. The PX4 & Gazebo Simulation
   px4-sim:
-    # build: .
-    image: filipekann/docker-gz-sim-dds-agent:1.0
+    build: .
+    # image: filipekann/docker-gz-sim-dds-agent:1.0
     container_name: atmos_sim
     network_mode: host
     ipc: host
@@ -16,14 +16,12 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./workspace/:/workspace
     # Launches the simulation and QGC without FUSE
-    command: >
-      /bin/bash -c "
-      useradd -m qgcuser || true &&
-      sudo -E -u qgcuser /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run &
-      MicroXRCEAgent udp4 -p 8888 &
-      (while ! /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-param set UXRCE_DDS_AG_IP 2130706433 2>/dev/null; do sleep 1; done && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client stop && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client start -t udp -p 8888) &
-      source /opt/ros/jazzy/setup.bash &&
-      source /px4_ws/install/setup.bash &&
-      cd /PX4-Autopilot &&
-      make px4_sitl_spacecraft gz_atmos_kthspacelab
-      "
+    command:
+      - -lc
+      - |
+        useradd -m qgcuser || true &&
+        sudo -E -u qgcuser /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run &
+        MicroXRCEAgent udp4 -p 8888 &
+        (while ! /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-param set UXRCE_DDS_AG_IP 2130706433 2>/dev/null; do sleep 1; done && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client stop && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client start -t udp -p 8888) &
+        cd /PX4-Autopilot &&
+        make px4_sitl_spacecraft gz_atmos_kthspacelab

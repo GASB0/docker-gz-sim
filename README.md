@@ -42,6 +42,18 @@ They must open Docker Desktop, go to Settings > Resources > WSL Integration, and
 
 ## 🚀 Quick Start
 
+**0. Make sure you have docker installed and running**
+Check if docker is running with
+```bash
+sudo systemctl status docker
+```
+
+if not, use the following to enable and start it
+```bash
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
 **1. Clone the repository**
 ```bash
 git clone [https://github.com/YourUsername/docker-gz-sim.git](https://github.com/YourUsername/docker-gz-sim.git)
@@ -93,8 +105,12 @@ To interact with ROS 2 and view the topics, you must enter the container:
 
 **1. Enter the container's bash environment**
 
+```bash
 docker exec -it atmos_sim bash
+```
 
 **2. Run the ROS 2 check (inside the container):**
 
+```bash
 ros2 topic list
+```
