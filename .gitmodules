@@ -1,0 +1,3 @@
+[submodule "workspace/px4_launch"]
+	path = workspace/px4_launch
+	url = git@github.com:DISCOWER/px4_launch.git

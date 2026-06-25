@@ -56,19 +56,28 @@ sudo systemctl start docker
 
 **1. Clone the repository**
 ```bash
-git clone [https://github.com/YourUsername/docker-gz-sim.git](https://github.com/YourUsername/docker-gz-sim.git)
+git clone git@github.com:Filipekann/docker-gz-sim.git
 ```
 ```bash
 cd docker-gz-sim
 ```
-```bash
-xhost +local:
-```
+
 **2. Launch the Simulation**
 Spin up both the PX4/Gazebo simulator and the Micro-XRCE-DDS Agent.
 ```bash
-docker compose up -d
+docker compose up --build -d
 ```
+**3. Set the PX4 sitl to offboard and arm**
+```bash
+docker compose attach px4-sim
+```
+```bash
+commander mode offboard
+```
+```bash
+commander arm
+```
+
 
 **If you want to build the image locally**
 This is not necessary if you want to test run the simulation.
@@ -81,19 +90,7 @@ This will take some time upon the first run as it compiles PX4 and the DDS agent
 docker build .
 ```
 
-📡 Accessing ROS 2 Topics
-
-Because the docker-compose.yml is configured to use network_mode: host, your Docker container shares the network with your host machine.
-
-If you have ROS 2 installed locally, you can view the live telemetry data from the simulated drone without even entering the container:
-```bash
-# On your local machine:
-source /opt/ros/jazzy/setup.bash
-ros2 topic list
-ros2 topic echo /fmu/out/vehicle_attitude
-```
-
-🛑 Shutting Down
+**🛑 Shutting Down**
 
 To cleanly stop the simulation, stop the DDS bridge, and tear down the containers:
 ```bash
@@ -101,6 +98,7 @@ docker compose down
 ```
 
 
+**📡 Accessing ROS 2 Topics**
 To interact with ROS 2 and view the topics, you must enter the container:
 
 **1. Enter the container's bash environment**
