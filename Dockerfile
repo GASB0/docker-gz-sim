@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 
 # 1. Clone PX4 (Optimized with --depth 1)
 WORKDIR /PX4-Autopilot
-RUN git clone --depth 1 -b v1.17.0 https://github.com/PX4/PX4-Autopilot.git . --recursive
+RUN git clone --depth 1 -b v1.17.0_discower https://github.com/DISCOWER/PX4-Space-Systems.git . --recursive
 
 # 2. Install PX4 required packages
 RUN bash ./Tools/setup/ubuntu.sh
@@ -154,5 +154,8 @@ RUN chown -R $USERNAME:$USERNAME /PX4-Autopilot /ros2_ws /px4_ws /acados /home/$
 
 USER $USERNAME
 WORKDIR /home/$USERNAME
+
+# Default QGC configurations
+COPY QGCconfig.ini .config/QGroundControl/QGroundControl.ini
 
 ENTRYPOINT ["/bin/bash"]

@@ -21,6 +21,7 @@ services:
       - XAUTHORITY=/home/developer/.Xauthority
       - QT_X11_NO_MITSHM=1
       - HEADLESS=${HEADLESS:-0}
+      - NS=quadrotor
     volumes:
       # Mounts the X11 socket for Gazebo GUI
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -30,7 +31,7 @@ services:
     command:
       - -lic
       - |
-        MicroXRCEAgent udp4 -p 8888 2>&1 > /workspace/MicroXRCEAgent_logs.txt &
-        /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run 2>&1 > /workspace/QGC_logs.txt &
-        ros2 launch px4_mpc mpc_quadrotor_launch.py 2>&1 > /workspace/mpc_logs.txt &
-        cd /PX4-Autopilot && HEADLESS=$HEADLESS make px4_sitl gz_x500
+        MicroXRCEAgent udp4 -p 8888 > /workspace/MicroXRCEAgent_logs.txt 2>&1 &
+        /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run > /workspace/QGC_logs.txt 2>&1 &
+        ros2 launch px4_mpc mpc_spacecraft_launch.py > /workspace/mpc_logs.txt 2>&1 &
+        cd /PX4-Autopilot && HEADLESS=$HEADLESS make px4_sitl_spacecraft gz_atmos
