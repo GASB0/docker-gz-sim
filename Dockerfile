@@ -54,11 +54,11 @@ RUN apt-get update && apt-get install -y \
     && apt-get remove -y modemmanager \
     && rm -rf /var/lib/apt/lists/*
 
-RUN usermod -a -G dialout root
-
 # Download and configure QGroundControl
 RUN wget https://d176tv9ibo4jno.cloudfront.net/latest/QGroundControl-x86_64.AppImage \
     && chmod +x ./QGroundControl-x86_64.AppImage
+
+
 
 # 7. Install and build the Micro XRCE-DDS Agent
 WORKDIR /Micro-XRCE-DDS-Agent
@@ -137,10 +137,22 @@ RUN rosdep init 2>/dev/null || true \
 RUN bash -c "source /opt/ros/humble/setup.bash && colcon build --packages-up-to px4_mpc"
 
 # 8. Final Environment Setup
-# Append the source commands to bashrc so they are active when you open the container
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
-    echo "source /px4_ws/install/setup.bash" >> ~/.bashrc && \
-    echo "source /ros2_ws/install/setup.bash" >> ~/.bashrc
+ARG USERNAME=developer
+ARG UID=1000
+ARG GID=1000
 
+RUN groupadd -g $GID $USERNAME && \
+    useradd -m -u $UID -g $GID -G sudo,dialout $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USERNAME/.bashrc && \
+    echo "source /px4_ws/install/setup.bash" >> /home/$USERNAME/.bashrc && \
+    echo "source /ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+
+# Fix ownership of runtime-writable directories for the developer user
+RUN chown -R $USERNAME:$USERNAME /PX4-Autopilot /ros2_ws /px4_ws /acados /home/$USERNAME
+
+USER $USERNAME
+WORKDIR /home/$USERNAME
 
 ENTRYPOINT ["/bin/bash"]

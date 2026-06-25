@@ -1,27 +1,36 @@
 services:
   # 1. The PX4 & Gazebo Simulation
   px4-sim:
-    build: .
-    # image: filipekann/docker-gz-sim-dds-agent:1.0
+    build:
+      context: .
+      args:
+        UID: "${UID:-1000}"
+        GID: "${GID:-1000}"
     container_name: atmos_sim
     network_mode: host
     ipc: host
     privileged: true
+    tty: true
+    stdin_open: true
+    entrypoint: /bin/bash
+    user: "${UID:-1000}:${GID:-1000}"
+    group_add:
+      - dialout
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=${DISPLAY:-:0}
+      - XAUTHORITY=/home/developer/.Xauthority
       - QT_X11_NO_MITSHM=1
-      - FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+      - HEADLESS=${HEADLESS:-0}
     volumes:
       # Mounts the X11 socket for Gazebo GUI
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ~/.Xauthority:/home/developer/.Xauthority:ro
       - ./workspace/:/workspace
-    # Launches the simulation and QGC without FUSE
+    # Launches the simulation and QGC
     command:
-      - -lc
+      - -lic
       - |
-        useradd -m qgcuser || true &&
-        sudo -E -u qgcuser /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run &
-        MicroXRCEAgent udp4 -p 8888 &
-        (while ! /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-param set UXRCE_DDS_AG_IP 2130706433 2>/dev/null; do sleep 1; done && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client stop && /PX4-Autopilot/build/px4_sitl_spacecraft/bin/px4-uxrce_dds_client start -t udp -p 8888) &
-        cd /PX4-Autopilot &&
-        make px4_sitl_spacecraft gz_atmos_kthspacelab
+        MicroXRCEAgent udp4 -p 8888 2>&1 > /workspace/MicroXRCEAgent_logs.txt &
+        /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run 2>&1 > /workspace/QGC_logs.txt &
+        ros2 launch px4_mpc mpc_quadrotor_launch.py 2>&1 > /workspace/mpc_logs.txt &
+        cd /PX4-Autopilot && HEADLESS=$HEADLESS make px4_sitl gz_x500
