@@ -28,7 +28,7 @@ services:
       - ./workspace/:/workspace
     # Launches the simulation and QGC
     command:
-      - -lc
+      - -lic
       - |
         MicroXRCEAgent udp4 -p 8888 2>&1 > /workspace/MicroXRCEAgent_logs.txt &
         /qgc/QGroundControl-x86_64.AppImage --appimage-extract-and-run 2>&1 > /workspace/QGC_logs.txt &
